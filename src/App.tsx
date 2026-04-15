@@ -394,6 +394,46 @@ const Results = ({ data, onEmailSubmit }: { data: any, onEmailSubmit: () => void
   const age = data?.age || "28";
   const gender = data?.gender || "female";
 
+  const [email, setEmail] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
+  const [error, setError] = useState("");
+
+  const validateEmail = (email: string) => {
+    // Strict regex for format
+    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!re.test(email)) return "Please enter a valid email address.";
+    
+    // Block common "fake" or disposable domains
+    const disposable = ['test.com', 'example.com', 'mailinator.com', 'temp-mail.org', '10minutemail.com'];
+    const domain = email.split('@')[1]?.toLowerCase();
+    if (disposable.includes(domain)) return "Please use a real working email address.";
+    
+    // Ensure it's not just random text like "asdf@asdf.com"
+    const localPart = email.split('@')[0];
+    if (localPart.length < 3) return "Email address is too short.";
+    
+    return "";
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const validationError = validateEmail(email);
+    
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setError("");
+    setIsValidating(true);
+    
+    // Simulate a deep verification check (DNS/SMTP simulation)
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    
+    setIsValidating(false);
+    onEmailSubmit();
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <motion.div
@@ -519,23 +559,54 @@ const Results = ({ data, onEmailSubmit }: { data: any, onEmailSubmit: () => void
             
             <form 
               className="space-y-4" 
-              onSubmit={(e) => {
-                e.preventDefault();
-                onEmailSubmit();
-              }}
+              onSubmit={handleSubmit}
             >
-              <div className="relative">
-                <Mail className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 opacity-20" />
-                <input 
-                  type="email" 
-                  placeholder="Email address" 
-                  className="w-full pl-16 pr-8 py-5 rounded-full bg-white border border-brand-primary/10 focus:border-brand-accent outline-none transition-all font-bold text-lg"
-                  required
-                />
+              <div className="space-y-2">
+                <div className="relative">
+                  <Mail className={`absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors ${error ? 'text-red-400 opacity-100' : 'opacity-20'}`} />
+                  <input 
+                    type="email" 
+                    placeholder="Email address" 
+                    className={`w-full pl-16 pr-8 py-5 rounded-full bg-white border outline-none transition-all font-bold text-lg ${error ? 'border-red-400 ring-4 ring-red-400/10' : 'border-brand-primary/10 focus:border-brand-accent'}`}
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError("");
+                    }}
+                    disabled={isValidating}
+                    required
+                  />
+                </div>
+                {error && (
+                  <motion.p 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-red-500 text-xs font-bold pl-6"
+                  >
+                    {error}
+                  </motion.p>
+                )}
               </div>
-              <button className="pill-btn w-full py-5 flex items-center justify-center gap-3">
-                Reveal My Protocol
-                <ArrowRight className="w-5 h-5" />
+              <button 
+                type="submit"
+                disabled={isValidating}
+                className="pill-btn w-full py-5 flex items-center justify-center gap-3 disabled:opacity-70"
+              >
+                {isValidating ? (
+                  <>
+                    <motion.div 
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full"
+                    />
+                    Verifying Email...
+                  </>
+                ) : (
+                  <>
+                    Reveal My Protocol
+                    <ArrowRight className="w-5 h-5" />
+                  </>
+                )}
               </button>
             </form>
           </div>
@@ -590,7 +661,7 @@ const SalesPage = () => {
                 
                 <div className="flex flex-col sm:flex-row items-center gap-8 pt-4">
                   <a 
-                    href="https://wisemom.gumroad.com/l/bybhqj?wanted=true" 
+                    href="https://pay.hotmart.com/D98545029C" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="pill-btn px-12 py-6 text-xl flex items-center gap-3"
