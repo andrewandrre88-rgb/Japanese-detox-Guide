@@ -661,7 +661,7 @@ const SalesPage = () => {
                 
                 <div className="flex flex-col sm:flex-row items-center gap-8 pt-4">
                   <a 
-                    href="https://pay.hotmart.com/D98545029C" 
+                    href="https://wisemom.gumroad.com/l/bybhqj?wanted=true" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="pill-btn px-12 py-6 text-xl flex items-center gap-3"
